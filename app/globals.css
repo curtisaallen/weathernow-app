@@ -1,15 +1,33 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --background: #0b0f1a;
+  --foreground: #ffffff;
 }
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
+  /* fonts (optional; only if you actually set these somewhere) */
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
+
+  /* colors */
+  --color-ink: #0b0f1a;
+  --color-surface: #111827;
+  --color-panel: #4455da;
+
+  /* “brand” with 500/600 shades (use text-brand-500, bg-brand-600, etc.) */
+  --color-brand-500: #6366f1;
+  --color-brand-600: #4f46e5;
+
+  --color-brand-deep: #312f4b;
+  --color-brand-deep-dark: #26243a;
+
+  /* shadow utility: shadow-soft */
+  --shadow-soft: 0 10px 24px rgba(0,0,0,.18);
+
+  /* optional: map background/foreground tokens to Tailwind colors */
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
 }
 
 @media (prefers-color-scheme: dark) {
