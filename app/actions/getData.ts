@@ -105,19 +105,25 @@ export async function getHourlyByDayFromCoords(
 
   const { hourly, timezone } = await res.json();
 
-  const rows = hourly.time.map((t, i) => ({
-    time: t,
-    temperature: hourly.temperature_2m?.[i],
-    feelsLike: hourly.apparent_temperature?.[i],
-    humidity: hourly.relative_humidity_2m?.[i],
-    precipitation: hourly.precipitation?.[i],
-    cloudCover: hourly.cloud_cover?.[i],
-    windSpeed: hourly.wind_speed_10m?.[i],
-    code: hourly.weather_code?.[i],
-  }));
+  const rows: HourRow[] = (hourly.time as string[]).map(
+    (t: string, i: number): HourRow => ({
+      time: t,
+      temperature: hourly.temperature_2m?.[i],
+      feelsLike: hourly.apparent_temperature?.[i],
+      humidity: hourly.relative_humidity_2m?.[i],
+      precipitation: hourly.precipitation?.[i],
+      cloudCover: hourly.cloud_cover?.[i],
+      windSpeed: hourly.wind_speed_10m?.[i],
+      code: hourly.weather_code?.[i],
+    })
+  );
 
-  const byDay = rows.reduce(
-    (a, r) => ((a[r.time.slice(0, 10)] ||= []).push(r), a),
+  const byDay = rows.reduce<Record<string, HourRow[]>>(
+    (acc, row) => {
+      const day = row.time.slice(0, 10); // "YYYY-MM-DD"
+      (acc[day] ??= []).push(row);
+      return acc;
+    },
     {}
   );
 
