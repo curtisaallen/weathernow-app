@@ -89,6 +89,17 @@ export async function getWeatherStats(lat = 33.749, lon = -84.388, tz = "America
   };
 }
 
+type HourRow = {
+  time: string;
+  temperature: number | null | undefined;
+  feelsLike: number | null | undefined;
+  humidity: number | null | undefined;
+  precipitation: number | null | undefined;
+  cloudCover: number | null | undefined;
+  windSpeed: number | null | undefined;
+  code: number | null | undefined;
+};
+
 
 export async function getHourlyByDayFromCoords(
   lat = 33.749,
