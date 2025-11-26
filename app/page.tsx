@@ -5,6 +5,8 @@ import CurrentWeather from './components/CurrentWeather';
 import DailyForecast from './components/DailyForecast';
 import GetWeatherStats from './components/GetWeatherStats';
 import HourlyForecast from './components/HourlyForecast';
+import type { Days, HourlyDay, Stats, GetStats } from "./types/weather";
+
 
 export default function Home() {
   const [weatherCity, setWeatherCity] = useState('');
@@ -12,9 +14,10 @@ export default function Home() {
   const [weatherDateStr, setWeatherDateStr] = useState('');
   const [weatherTempC, setWeatherTempC] = useState('');
   const [weatherCode, setWeatherCode] = useState('');
-  const [days, setwDays] = useState([]);
-  const [weatherStats, setWeatherStats] = useState({});
-  const [hourlyStats, setHourlyStats] = useState([]);
+  const [days, setwDays] = useState<Days[]>([]);
+  const [weatherStats, setWeatherStats] = useState<Stats | null>(null);
+  const [getweatherStats, setGetWeatherStats] = useState<GetStats | null>(null);
+  const [hourlyStats, setHourlyStats] = useState<HourlyDay[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
 
       useEffect(() => {
@@ -27,7 +30,7 @@ export default function Home() {
 
             const fetchedDailyForecast = await getDailyForecast();
             const d = fetchedDailyForecast.daily;
-            const tempdays = d.time.map((iso, i) => ({
+            const tempdays = d.time.map((iso: string, i: number) => ({
                 date: new Date(iso),
                 code: d.weathercode[i],
                 tMax: d.temperature_2m_max[i],
@@ -38,14 +41,20 @@ export default function Home() {
                 sunrise: d.sunrise[i],
                 sunset: d.sunset[i],
               }));
-              
+
             setwDays(tempdays);
             setWeatherCity(fetchedCurrent.city)
             setWeatherCountry(fetchedCurrent.country)
             setWeatherDateStr(fetchedCurrent.dateStr)
             setWeatherTempC(fetchedCurrent.tempC)
             setWeatherCode(fetchedCurrent.code)
-            setWeatherStats(fetchedgetWeatherStats)
+            setWeatherStats({
+              feelsLike: String(fetchedgetWeatherStats.feelsLike),
+              humidity: String(fetchedgetWeatherStats.humidity),
+              wind: String(fetchedgetWeatherStats.wind),
+              precip: String(fetchedgetWeatherStats.precip),
+            });
+            setGetWeatherStats(fetchedgetWeatherStats)
             setHourlyStats(fetchgetHourlyByDayFromCoords);
 
 
@@ -64,15 +73,15 @@ const handleSearch = (event: React.ChangeEvent<HTMLInputElement>) => {
 }
 
 
-const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
-          event.preventDefault()
+const handleSubmit: React.MouseEventHandler<HTMLButtonElement> = async (event) => {
+  event.preventDefault();
 
           const fetchedCurrent = await getWeatherFor(searchTerm,"US");
           const fetchedData = await getWeatherData(fetchedCurrent.city);
           const fetchedgetWeatherStats = await getWeatherStats(fetchedData.results[0].latitude, fetchedData.results[0].longitude, fetchedData.results[0].timezone);
           const fetchedDailyForecast = await getDailyForecast(fetchedData.results[0].latitude, fetchedData.results[0].longitude, "auto", 7);
           const d = fetchedDailyForecast.daily;
-          const tempdays = d.time.map((iso, i) => ({
+          const tempdays = d.time.map((iso: string, i: number) => ({
               date: new Date(iso),
               code: d.weathercode[i],
               tMax: d.temperature_2m_max[i],
@@ -90,7 +99,13 @@ const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
           setWeatherDateStr(fetchedCurrent.dateStr)
           setWeatherTempC(fetchedCurrent.tempC)
           setWeatherCode(fetchedCurrent.code)
-          setWeatherStats(fetchedgetWeatherStats)
+          setWeatherStats({
+              feelsLike: String(fetchedgetWeatherStats.feelsLike),
+              humidity: String(fetchedgetWeatherStats.humidity),
+              wind: String(fetchedgetWeatherStats.wind),
+              precip: String(fetchedgetWeatherStats.precip),
+          });
+          setGetWeatherStats(fetchedgetWeatherStats)
           setwDays(tempdays);
           setHourlyStats(fetchgetHourlyByDayFromCoords);
   }
@@ -165,7 +180,8 @@ const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
 
 ) }
 
-{Object.keys(weatherStats).length != 0 ? <GetWeatherStats stats={weatherStats}  />: '' }
+{weatherStats && <GetWeatherStats stats={weatherStats} />}
+
 
 
 {days.length != 0 ? <h3 className="text-left text-[1rem] font-semibold">Daily forecast</h3>: '' }
@@ -178,11 +194,14 @@ const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
 
 
 
-{days.map((day, index) => {
-  return <DailyForecast key={index} day={day} />;
-})}
-
-
+{days.map((day: Days, index: number) => (
+  <DailyForecast
+    key={index}
+    day={day}
+    tempmax={day.tMax}
+    tempmin={day.tMin}
+  />
+))}
 
                      
 
@@ -191,15 +210,13 @@ const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
             </section>
 
 
-            {Object.keys(hourlyStats).length != 0 ? (
-                <HourlyForecast stats={hourlyStats}  />
+{hourlyStats.length > 0 ? (
+  <HourlyForecast stats={hourlyStats} />
 ) : (
-
-<div className="flex items-center justify-center h-screen">
-  <p className="text-lg font-semibold text-gray-700">Loading...</p>
-</div>
-
-) }
+  <div className="flex items-center justify-center h-screen">
+    <p className="text-lg font-semibold text-gray-700">Loading...</p>
+  </div>
+)}
             
         </div>
     </div>

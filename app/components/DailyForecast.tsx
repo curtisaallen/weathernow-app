@@ -1,17 +1,27 @@
 "use client";
-import React, { Component } from 'react'
+import React from 'react'
 import Image from "next/image";
 import { wmoToImage } from "../lib/iconMap";
+import { Days } from "../types/weather"
 
-function weekdayName(dateInput, timeZone = "America/New_York") {
-  const d = typeof dateInput === "string" ? new Date(dateInput) : dateInput;
+
+
+type Props = {
+    day: Days;
+    tempmax: number;
+    tempmin: number;
+}
+
+
+function weekdayName(dateInput: Date, timeZone = "America/New_York") {
   return new Intl.DateTimeFormat("en-US", {
     weekday: "long",
     timeZone,
-  }).format(d); // e.g., "Monday"
+  }).format(dateInput);
 }
 
-export default function DailyForecast({ day, tempmax = 15, tempmin = 6 }) {
+
+export default function DailyForecast({ day, tempmax = 15, tempmin = 6 }:Props) {
     const label = weekdayName(day.date,"America/New_York");
     const icon = wmoToImage(day.code);
     return (

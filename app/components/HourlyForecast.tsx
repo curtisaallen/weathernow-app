@@ -1,12 +1,15 @@
 "use client";
+
 import { useMemo, useState, useEffect } from "react";
 import Image from "next/image";
 import { wmoToImage } from "../lib/iconMap";
+import type { HourlyDay } from "../types/weather"; 
 
-type HourBlock = { time: string | number | Date; temperature: number };
-type HourlyDay = { date: string; weekday: string; hours: HourBlock[] };
+type Props = {
+  stats: HourlyDay[];
+};
 
-export default function HourlyForecast({ stats }: { stats: HourlyDay[] }) {
+export default function HourlyForecast({ stats }: Props) {
   const dayNames = ["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"];
   const todayName = dayNames[new Date().getDay()];
 
@@ -81,17 +84,37 @@ export default function HourlyForecast({ stats }: { stats: HourlyDay[] }) {
 
       <div className="h-[600px] overflow-y-auto">
         {current.hours?.map((hour, idx) => {
-          const time = new Date(hour.time);
-          const formatted = time.toLocaleTimeString([], { hour: "numeric", hour12: true });
+          // hour.time might be string | number | Date depending on your shared type
+          const timeValue =
+            hour.time instanceof Date
+              ? hour.time
+              : new Date(hour.time as any);
 
-          const icon = wmoToImage(hour.code);
+          const formatted = timeValue.toLocaleTimeString([], {
+            hour: "numeric",
+            hour12: true,
+          });
+
+          const icon = wmoToImage(hour.code ?? 0);
+          const tempDisplay =
+            hour.temperature != null ? `${hour.temperature}°` : "--";
+
           return (
-            <div key={idx} className="hour-card flex justify-between items-center p-4 mb-2 bg-brand-deep-dark text-white font-bold rounded-xl">
+            <div
+              key={idx}
+              className="hour-card flex justify-between items-center p-4 mb-2 bg-brand-deep-dark text-white font-bold rounded-xl"
+            >
               <div className="hourly-forecast flex gap-2">
-                <Image alt="Weather" width={24} height={24} className="day-icon" src={icon.src} />
+                <Image
+                  alt="Weather"
+                  width={24}
+                  height={24}
+                  className="day-icon"
+                  src={icon.src}
+                />
                 <div className="font-medium">{formatted}</div>
               </div>
-              <div className="hourly-temp">{hour.temperature}°</div>
+              <div className="hourly-temp">{tempDisplay}</div>
             </div>
           );
         })}
@@ -99,4 +122,3 @@ export default function HourlyForecast({ stats }: { stats: HourlyDay[] }) {
     </aside>
   );
 }
-
