@@ -74,6 +74,7 @@ export default function HourlyForecast({ stats }: Props) {
                 onClick={() => pickDay(d)}
                 className="dropdown-item block w-full rounded px-3 py-2 mb-2 text-left hover:bg-slate-100 hover:text-black bg-brand-deep-dark text-white"
                 role="option"
+                aria-selected={selectedDay === d}
               >
                 {d.substring(0,3)}
               </button>
@@ -85,10 +86,7 @@ export default function HourlyForecast({ stats }: Props) {
       <div className="h-[600px] overflow-y-auto">
         {current.hours?.map((hour, idx) => {
           // hour.time might be string | number | Date depending on your shared type
-          const timeValue =
-            hour.time instanceof Date
-              ? hour.time
-              : new Date(hour.time as any);
+          const timeValue = new Date(hour.time);
 
           const formatted = timeValue.toLocaleTimeString([], {
             hour: "numeric",

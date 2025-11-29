@@ -5,7 +5,7 @@ import CurrentWeather from './components/CurrentWeather';
 import DailyForecast from './components/DailyForecast';
 import GetWeatherStats from './components/GetWeatherStats';
 import HourlyForecast from './components/HourlyForecast';
-import type { Days, HourlyDay, Stats, GetStats } from "./types/weather";
+import type { Days, HourlyDay, Stats } from "./types/weather";
 
 
 export default function Home() {
@@ -16,14 +16,12 @@ export default function Home() {
   const [weatherCode, setWeatherCode] = useState('');
   const [days, setwDays] = useState<Days[]>([]);
   const [weatherStats, setWeatherStats] = useState<Stats | null>(null);
-  const [getweatherStats, setGetWeatherStats] = useState<GetStats | null>(null);
   const [hourlyStats, setHourlyStats] = useState<HourlyDay[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
 
       useEffect(() => {
         async function loadData() {
           try {
-            const fetchedData = await getWeatherData();
             const fetchedCurrent = await getWeatherFor();
             const fetchedgetWeatherStats = await getWeatherStats();
             const fetchgetHourlyByDayFromCoords = await getHourlyByDayFromCoords();
@@ -54,7 +52,7 @@ export default function Home() {
               wind: String(fetchedgetWeatherStats.wind),
               precip: String(fetchedgetWeatherStats.precip),
             });
-            setGetWeatherStats(fetchedgetWeatherStats)
+
             setHourlyStats(fetchgetHourlyByDayFromCoords);
 
 
@@ -105,7 +103,6 @@ const handleSubmit: React.MouseEventHandler<HTMLButtonElement> = async (event) =
               wind: String(fetchedgetWeatherStats.wind),
               precip: String(fetchedgetWeatherStats.precip),
           });
-          setGetWeatherStats(fetchedgetWeatherStats)
           setwDays(tempdays);
           setHourlyStats(fetchgetHourlyByDayFromCoords);
   }
@@ -146,7 +143,7 @@ const handleSubmit: React.MouseEventHandler<HTMLButtonElement> = async (event) =
     </nav>
 
   <main className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-9 text-center flex flex-col items-center">
-    <h1 className="text-5xl font-bold">How's the sky looking today?</h1>
+    <h1 className="text-5xl font-bold">How{"'"}s the sky looking today?</h1>
     <form className="flex items-center justify-center mt-14 max-w-2xl justify-between gap-4">
         <div className="flex py-4 px-6 bg-brand-deep rounded justify-between gap-2">
             <svg xmlns="http://www.w3.org/2000/svg" width="21" height="21" fill="none" viewBox="0 0 21 21">
@@ -198,8 +195,6 @@ const handleSubmit: React.MouseEventHandler<HTMLButtonElement> = async (event) =
   <DailyForecast
     key={index}
     day={day}
-    tempmax={day.tMax}
-    tempmin={day.tMin}
   />
 ))}
 

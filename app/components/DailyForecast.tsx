@@ -8,8 +8,6 @@ import { Days } from "../types/weather"
 
 type Props = {
     day: Days;
-    tempmax: number;
-    tempmin: number;
 }
 
 
@@ -21,7 +19,9 @@ function weekdayName(dateInput: Date, timeZone = "America/New_York") {
 }
 
 
-export default function DailyForecast({ day, tempmax = 15, tempmin = 6 }:Props) {
+export default function DailyForecast({ day}:Props) {
+    const tempmax = day.tMax ?? 15;
+    const tempmin = day.tMin ?? 6;
     const label = weekdayName(day.date,"America/New_York");
     const icon = wmoToImage(day.code);
     return (
@@ -37,8 +37,8 @@ export default function DailyForecast({ day, tempmax = 15, tempmin = 6 }:Props) 
                         src={icon.src}
                         />
                         <div className="flex justify-between gap-2">
-                                <p className="text-sm mb-3 font-bold">{day.tMax}°</p>
-                                <p className="text-sm text-neutral-300 mb-3 font-light">{day.tMin}°</p>
+                                <p className="text-sm mb-3 font-bold">{tempmax}°</p>
+                                <p className="text-sm text-neutral-300 mb-3 font-light">{tempmin}°</p>
                             </div>
                         </div>
     )
